@@ -1,0 +1,38 @@
+{
+  "name": "tka-fancy-select",
+  "version": "1.0.0",
+  "description": "A premium, accessible, and highly customizable vanilla JavaScript select replacement.",
+  "main": "./dist/tka-fancy-select.umd.cjs",
+  "module": "./dist/tka-fancy-select.js",
+  "browser": "./dist/tka-fancy-select.umd.cjs",
+  "style": "./dist/tka-fancy-select.css",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "release": "standard-version"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "terser": "^5.0.0",
+    "standard-version": "^9.5.0"
+  },
+  "keywords": [
+    "select",
+    "dropdown",
+    "multiselect",
+    "vanilla-js",
+    "custom-select",
+    "accessible",
+    "ui"
+  ],
+  "author": "TKA",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thekitchenagency/tka-fancy-select.git"
+  }
+}

@@ -42,12 +42,23 @@ npm run build
 
 ## Publishing
 
-The project is configured to publish automatically to npm via **GitHub Actions** when a new tag is pushed.
+This project uses **Semantic Versioning** and **Conventional Commits**. To release a new version:
 
-1.  Update version in `package.json`.
-2.  Commit and push changes.
-3.  Create a new tag: `git tag v1.0.1`.
-4.  Push the tag: `git push origin v1.0.1`.
+1.  Commit your changes using the Conventional Commits format:
+    *   `feat: add new feature` (Minor bump)
+    *   `fix: resolve bug` (Patch bump)
+    *   `feat!: breaking change` (Major bump)
+2.  Run the release script:
+    ```bash
+    npm run release
+    ```
+    This will bump the version in `package.json`, generate `CHANGELOG.md`, and create a git tag.
+3.  Push the changes and tags:
+    ```bash
+    git push --follow-tags origin main
+    ```
+
+The **GitHub Action** will automatically pick up the new tag, build the library, and publish it to npm.
 
 > [!IMPORTANT]
 > Ensure you have added your `NPM_TOKEN` to your GitHub Repository Secrets.

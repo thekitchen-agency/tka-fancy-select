@@ -3,383 +3,338 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TKA Fancy Select - Documentation & Showcase</title>
+  <title>TKA Fancy Select | Premium Accessible Library</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="tka-fancy-select.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --accent-color: #484585;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --code-bg: #1e293b;
+      --primary: rgb(72, 69, 133);
+      --primary-dark: rgb(58, 55, 106);
+      --bg: #f8fafc;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      margin: 0;
-      padding: 0;
-      line-height: 1.5;
-    }
-
-    header {
-      background: white;
-      padding: 60px 20px;
-      text-align: center;
-      border-bottom: 1px solid #e2e8f0;
-      margin-bottom: 40px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 48px;
-      font-weight: 800;
-      color: var(--accent-color);
-      letter-spacing: -0.03em;
-    }
-
-    header p {
-      color: var(--text-muted);
-      margin-top: 15px;
-      font-size: 20px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 0 20px 100px;
     }
 
-    .section-title {
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 20px;
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3rem;
       font-weight: 700;
-      display: block;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 10px;
-      margin-top: 60px;
+      color: var(--primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Showcase Styles */
+    .showcase {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
     }
 
     .showcase-item {
-      background: var(--card-bg);
-      padding: 40px;
-      border-radius: 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 20px 25px -5px rgba(0,0,0,0.05);
-      margin-bottom: 60px;
-      border: 1px solid #f1f5f9;
+      background: var(--white);
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       position: relative;
+      overflow: visible;
+    }
+
+    .showcase-item:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     .showcase-item h3 {
-      margin: 0 0 12px 0;
-      font-size: 26px;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.01em;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .showcase-item p {
-      color: var(--text-muted);
-      font-size: 16px;
-      margin-bottom: 30px;
-      line-height: 1.6;
+      color: var(--text-light);
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+    }
+
+    .preview-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      align-items: flex-start;
     }
 
     .badges {
+      position: absolute;
+      top: 20px;
+      right: 20px;
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 8px;
     }
 
     .badge {
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 4px;
       letter-spacing: 0.05em;
     }
 
-    .badge-multiple { background: #ecfdf5; color: #059669; }
-    .badge-single { background: #fff1f2; color: #e11d48; }
-    .badge-search { background: #eff6ff; color: #2563eb; }
-    .badge-a11y { background: #faf5ff; color: #7e22ce; }
-    .badge-ui { background: #fff7ed; color: #c2410c; }
+    .badge-multiple { background: #e0f2fe; color: #0369a1; }
+    .badge-search { background: #fef3c7; color: #92400e; }
+    .badge-auto { background: #f0fdf4; color: #166534; }
 
-    .preview-section {
-      background: #fcfdfe;
-      border: 2px dashed #e2e8f0;
-      border-radius: 16px;
-      padding: 40px;
-      margin-bottom: 35px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    /* Event Log */
+    #event-log {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1e293b;
+      color: #cbd5e1;
+      border-radius: 8px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      max-height: 150px;
+      overflow-y: auto;
     }
 
-    .code-sections {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid #e2e8f0;
+      color: var(--text-light);
     }
-
-    .code-block-wrapper {
-      position: relative;
-    }
-
-    .code-label {
-      font-size: 11px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 8px;
-      font-weight: 700;
-      display: block;
-    }
-
-    .code-block {
-      padding: 20px;
-      background: var(--code-bg);
-      color: #e2e8f0;
-      border-radius: 12px;
-      font-size: 13px;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      overflow-x: auto;
-      white-space: pre;
-      margin: 0;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .hl-tag { color: #f472b6; }
-    .hl-attr { color: #fbbf24; }
-    .hl-val { color: #34d399; }
-    .hl-comm { color: #64748b; font-style: italic; }
 
     code {
       background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 0.9em;
-      color: var(--accent-color);
-      font-weight: 600;
-    }
-
-    kbd {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
       padding: 2px 5px;
-      font-size: 12px;
-      font-family: inherit;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>TKA Fancy Select</h1>
-    <p>A premium vanilla JavaScript component for elegant multi-select and single-select inputs.</p>
-  </header>
-
   <div class="container">
+    <header>
+      <h1>TKA Fancy Select</h1>
+      <p class="subtitle">A premium, accessible, and highly customizable vanilla JavaScript select replacement.</p>
+    </header>
 
-    <span class="section-title">Selection Visuals</span>
-
-    <!-- 1. Selection Tags/Pills -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-ui">Premium UI</span>
-        <span class="badge badge-multiple">Multi-select</span>
-      </div>
-      <h3>Modern Tags (Pills)</h3>
-      <p>Selected items are displayed as sleek, glass-morphism pills in the trigger. If too many are selected, a <code>+N</code> counter appears.</p>
+    <div class="showcase">
       
-      <div class="preview-section">
-        <select id="select-tags" multiple>
-          <option value="t1" selected>Design System</option>
-          <option value="t2" selected>Animation</option>
-          <option value="t3">Typography</option>
-          <option value="t4">Accessibility</option>
-        </select>
-      </div>
-
-      <div class="code-sections">
-        <div class="code-block-wrapper">
-          <span class="code-label">JavaScript Initialization</span>
-          <pre class="code-block"><span class="hl-tag">new</span> TKAFancySelect(el, {
-  showTags: <span class="hl-val">true</span>,
-  maxTags: <span class="hl-val">2</span>
-});</pre>
+      <!-- 1. Simple Select -->
+      <div class="showcase-item">
+        <h3>Standard Select</h3>
+        <p>A simple drop-in replacement for any single-select element. Smooth animations and full keyboard support.</p>
+        <div class="preview-section">
+          <select id="select-standard">
+            <option value="">Select a fruit...</option>
+            <option value="apple">Apple</option>
+            <option value="banana">Banana</option>
+            <option value="cherry">Cherry</option>
+          </select>
         </div>
       </div>
-    </div>
 
-    <!-- 2. Animated Checkmarks -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-ui">Animation</span>
-        <span class="badge badge-multiple">Multi-select</span>
-      </div>
-      <h3>Animated Checkmarks</h3>
-      <p>Interaction feels alive with smooth SVG checkmark animations in the dropdown list.</p>
-      
-      <div class="preview-section">
-        <select id="select-animations" multiple>
-          <option value="a1">Micro-interactions</option>
-          <option value="a2">Smooth Transitions</option>
-          <option value="a3">SVG Animations</option>
-        </select>
-      </div>
-      <p class="hl-comm">// Open the select above to see the animated selection state!</p>
-    </div>
-
-    <span class="section-title">Core Features</span>
-
-    <!-- 3. Keyboard Navigation -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-a11y">Accessibility</span>
-      </div>
-      <h3>Keyboard Control</h3>
-      <p>Fully navigable using <kbd>ArrowDown</kbd>, <kbd>ArrowUp</kbd>, and <kbd>Enter</kbd>.</p>
-      
-      <div class="preview-section">
-        <select id="select-keyboard" multiple>
-          <option value="k1">Frontend</option>
-          <option value="k2">Backend</option>
-          <option value="k3">DevOps</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 4. Single Select -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-single">Single Select</span>
-      </div>
-      <h3>Single Select Mode</h3>
-      <p>Standard behavior for single-select dropdowns, maintaining high-end aesthetics.</p>
-      
-      <div class="preview-section">
-        <select id="select-single">
-          <option value="s1">Fast Shipping</option>
-          <option value="s2" selected>Eco Shipping</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 5. Disabled States -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-multiple">Multi-select</span>
-      </div>
-      <h3>Disabled States</h3>
-      <p>Respects native <code>disabled</code> attributes on both selects and options.</p>
-      
-      <div class="preview-section" style="flex-direction: column; gap: 20px;">
-        <select id="select-disabled-item" multiple>
-          <option value="d1">Available</option>
-          <option value="d2" disabled>Disabled Option</option>
-        </select>
-        <select id="select-disabled-all" disabled>
-          <option>Locked Select</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 6. Auto-Initialization -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-ui">Efficiency</span>
-      </div>
-      <h3>Auto-Initialization</h3>
-      <p>Initialize multiple selects at once using data attributes.</p>
-      
-      <div class="preview-section">
-        <select data-tka-fancy-select data-title="Auto Select 1">
-          <option>Option A</option>
-          <option>Option B</option>
-        </select>
-      </div>
-
-      <div class="code-sections">
-        <div class="code-block-wrapper">
-          <span class="code-label">HTML</span>
-          <pre class="code-block">&lt;select <span class="hl-attr">data-tka-fancy-select</span> <span class="hl-attr">data-title</span>=<span class="hl-val">"Auto Select"</span>&gt;...</pre>
+      <!-- 2. Multiple Select with Tags -->
+      <div class="showcase-item">
+        <div class="badges">
+          <span class="badge badge-multiple">Multi-select</span>
         </div>
-        <div class="code-block-wrapper">
-          <span class="code-label">JavaScript</span>
-          <pre class="code-block">TKAFancySelect.<span class="hl-tag">initAll</span>();</pre>
+        <h3>Multiple Selection</h3>
+        <p>Supports multiple selections with visual tags (pills) and a counter for overflow.</p>
+        <div class="preview-section">
+          <select id="select-multi" multiple>
+            <option value="ui">User Interface</option>
+            <option value="ux">User Experience</option>
+            <option value="fe" selected>Frontend Development</option>
+            <option value="be">Backend Development</option>
+            <option value="ds" selected>Design Systems</option>
+          </select>
         </div>
       </div>
+
+      <!-- 3. Searchable Select -->
+      <div class="showcase-item">
+        <div class="badges">
+          <span class="badge badge-search">Searchable</span>
+        </div>
+        <h3>Filtered Search</h3>
+        <p>Built-in real-time filtering for long lists. Optimized for performance.</p>
+        <div class="preview-section">
+          <select id="select-search">
+            <option value="de">Germany</option>
+            <option value="ch" selected>Switzerland</option>
+            <option value="at">Austria</option>
+            <option value="fr">France</option>
+            <option value="it">Italy</option>
+            <option value="es">Spain</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 4. Event Hooks -->
+      <div class="showcase-item">
+        <h3>Event Hooks</h3>
+        <p>Listen to <code>tfs:open</code>, <code>tfs:close</code>, and <code>tfs:change</code> for custom integrations.</p>
+        <div class="preview-section" style="flex-direction: column;">
+          <select id="select-events">
+            <option>Option A</option>
+            <option>Option B</option>
+            <option>Option C</option>
+          </select>
+          <div id="event-log">Log initialized...</div>
+        </div>
+      </div>
+
+      <!-- 5. Disabled States -->
+      <div class="showcase-item">
+        <h3>Disabled States</h3>
+        <p>Respects native <code>disabled</code> attributes on both selects and options.</p>
+        <div class="preview-section" style="flex-direction: column; gap: 20px;">
+          <select id="select-disabled-item" multiple>
+            <option value="d1">Available</option>
+            <option value="d2" disabled>Disabled Option</option>
+          </select>
+          <select id="select-disabled-all" disabled>
+            <option>Locked Select</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 6. Remote Search -->
+      <div class="showcase-item">
+        <div class="badges"><span class="badge badge-search">AJAX</span></div>
+        <h3>Remote Search</h3>
+        <p>Fetch results dynamically as you type. Includes loading states and debouncing.</p>
+        <div class="preview-section">
+          <select id="select-remote" placeholder="Search users..."></select>
+        </div>
+      </div>
+
+      <!-- 7. Selection Limit -->
+      <div class="showcase-item">
+        <div class="badges"><span class="badge badge-multiple">Limited</span></div>
+        <h3>Selection Limits</h3>
+        <p>Control exactly how many items a user can pick. (Max 2 here)</p>
+        <div class="preview-section">
+          <select id="select-limit" multiple>
+            <option>Option 1</option>
+            <option>Option 2</option>
+            <option>Option 3</option>
+            <option>Option 4</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 8. Groups & Visuals -->
+      <div class="showcase-item">
+        <h3>Groups & Visuals</h3>
+        <p>Organize options with <code>optgroup</code> and add icons or images.</p>
+        <div class="preview-section">
+          <select id="select-groups">
+            <optgroup label="Fruits">
+              <option data-icon="🍎">Apple</option>
+              <option data-icon="🍌">Banana</option>
+            </optgroup>
+            <optgroup label="Countries">
+              <option data-image="https://flagcdn.com/w40/ch.png">Switzerland</option>
+              <option data-image="https://flagcdn.com/w40/de.png">Germany</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <!-- 9. Auto-Initialization -->
+      <div class="showcase-item">
+        <div class="badges">
+          <span class="badge badge-auto">Auto-Init</span>
+        </div>
+        <h3>Auto-Initialization</h3>
+        <p>Just add <code>data-tka-fancy-select</code> to your HTML and call <code>TKAFancySelect.initAll()</code>.</p>
+        <div class="preview-section">
+          <select data-tka-fancy-select='{"title": "Auto-Initialized"}'>
+            <option>Modern Approach</option>
+            <option>Legacy Support</option>
+          </select>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 7. Events -->
-    <div class="showcase-item">
-      <div class="badges">
-        <span class="badge badge-a11y">Events</span>
-      </div>
-      <h3>Event Hooks</h3>
-      <p>Listen to custom events for advanced integrations.</p>
-      
-      <div class="preview-section">
-        <select id="select-events" multiple>
-          <option>Event 1</option>
-          <option>Event 2</option>
-        </select>
-      </div>
-      <div id="event-log" style="font-size: 12px; color: var(--text-muted); background: #f1f5f9; padding: 10px; border-radius: 8px; margin-top: 10px;">
-        Event logs will appear here...
-      </div>
-    </div>
-
+    <footer>
+      <p>&copy; 2026 The Kitchen Agency. Built for designers and developers.</p>
+    </footer>
   </div>
 
-  <script src="tka-fancy-select.js"></script>
+  <script type="module" src="tka-fancy-select.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Manual Init
-      new TKAFancySelect(document.getElementById('select-tags'), {
-        title: 'Project Features',
-        showTags: true,
+      new TKAFancySelect('#select-standard');
+      
+      new TKAFancySelect('#select-multi', {
+        title: 'Skills',
         maxTags: 2
       });
 
-      new TKAFancySelect(document.getElementById('select-animations'), {
-        title: 'Choose Effects'
+      new TKAFancySelect('#select-search', {
+        title: 'Country',
+        hasSearch: true
       });
 
-      new TKAFancySelect(document.getElementById('select-keyboard'), {
-        title: 'Roles'
+      new TKAFancySelect('#select-disabled-item', {
+        title: 'Mixed States'
       });
-
-      new TKAFancySelect(document.getElementById('select-single'), {
-        title: 'Shipping'
-      });
-
-      new TKAFancySelect(document.getElementById('select-disabled-item'), {
-        title: 'Options'
-      });
-
-      new TKAFancySelect(document.getElementById('select-disabled-all'), {
+      
+      new TKAFancySelect('#select-disabled-all', {
         title: 'Locked'
       });
 
       // Event Demo
-      const eventSelect = new TKAFancySelect(document.getElementById('select-events'), {
+      new TKAFancySelect(document.getElementById('select-events'), {
         title: 'Try Events'
       });
       
@@ -391,7 +346,35 @@
 
       document.getElementById('select-events').parentElement.addEventListener('tfs:open', () => addLog('Dropdown Opened'));
       document.getElementById('select-events').parentElement.addEventListener('tfs:close', () => addLog('Dropdown Closed'));
-      document.getElementById('select-events').parentElement.addEventListener('tfs:change', (e) => addLog(`Selection Changed: ${JSON.stringify(e.detail)}`));
+      document.getElementById('select-events').parentElement.addEventListener('tfs:change', (e) => {
+        const { instance, ...data } = e.detail;
+        addLog(`Selection Changed: ${JSON.stringify(data)}`);
+      });
+
+      // Remote Search Demo
+      new TKAFancySelect('#select-remote', {
+        title: 'Remote Users',
+        remote: async (query) => {
+          await new Promise(resolve => setTimeout(resolve, 800));
+          const mockUsers = [
+            { value: 1, text: 'Admin User', count: 'Pro' },
+            { value: 2, text: 'Standard User', count: 'Active' },
+            { value: 3, text: 'Power User', count: 'Premium' },
+            { value: 4, text: 'Guest User', count: 'Free' },
+            { value: 5, text: 'Support User', count: 'Staff' }
+          ];
+          return mockUsers.filter(u => u.text.toLowerCase().includes(query.toLowerCase()));
+        }
+      });
+
+      new TKAFancySelect('#select-limit', {
+        title: 'Max 2 Items',
+        maxSelected: 2
+      });
+
+      new TKAFancySelect('#select-groups', {
+        title: 'Groups & Icons'
+      });
 
       // Auto Init Demo
       TKAFancySelect.initAll();

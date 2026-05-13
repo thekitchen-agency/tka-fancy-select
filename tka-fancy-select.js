@@ -36,23 +36,30 @@ class TKAFancySelect {
       closeText: 'Schliessen',
       searchPlaceholder: 'Suchen...',
       noResultsText: 'Keine Ergebnisse gefunden',
+      loadingText: 'Laden...',
       hasSearch: true,
       showActions: this.isMultiple,
       showCount: true,
       showTags: true,
       maxTags: 2,
       closeOnSelect: !this.isMultiple,
-      dropdownZIndex: 9999
+      dropdownZIndex: 9999,
+      remote: null, // Function: (query) => Promise<Array<{value, text, count}>>
+      debounceTimeout: 300,
+      maxSelected: null, // Number: limit selection
+      groupHeaders: true
     };
 
     // Merge options correctly
     this.options = { ...defaults, ...options };
 
     this.isOpen = false;
+    this.isLoading = false;
     this.searchQuery = '';
     this.focusedIndex = -1; // For keyboard navigation
     this.dom = {};
     this.boundEvents = {};
+    this.debounceTimer = null;
 
     this.init();
     
@@ -82,6 +89,17 @@ class TKAFancySelect {
     this.attachEvents();
     this.updateTriggerText();
     this.setupAria();
+    this.checkMobile();
+    window.addEventListener('resize', () => this.checkMobile());
+  }
+
+  checkMobile() {
+    this.isMobile = window.innerWidth <= 600;
+    if (this.isMobile) {
+      this.dom.wrapper.classList.add('is-mobile');
+    } else {
+      this.dom.wrapper.classList.remove('is-mobile');
+    }
   }
 
   setupAria() {
@@ -185,11 +203,22 @@ class TKAFancySelect {
 
     this.renderOptions();
 
-    // No Results
+    // States (No Results & Loading)
+    this.dom.statesWrapper = document.createElement('div');
+    this.dom.statesWrapper.className = 'tka-fancy-select-states';
+
     this.dom.noResults = document.createElement('div');
     this.dom.noResults.className = 'tka-fancy-select-no-results';
     this.dom.noResults.textContent = this.options.noResultsText;
     this.dom.noResults.style.display = 'none';
+
+    this.dom.loading = document.createElement('div');
+    this.dom.loading.className = 'tka-fancy-select-loading';
+    this.dom.loading.innerHTML = `<div class="tfs-spinner"></div><span>${this.options.loadingText}</span>`;
+    this.dom.loading.style.display = 'none';
+
+    this.dom.statesWrapper.appendChild(this.dom.noResults);
+    this.dom.statesWrapper.appendChild(this.dom.loading);
 
     // Footer
     const footer = document.createElement('div');
@@ -205,7 +234,7 @@ class TKAFancySelect {
     if (this.options.hasSearch) {
       this.dom.dropdown.appendChild(this.dom.searchWrapper);
     }
-    this.dom.dropdown.appendChild(this.dom.noResults);
+    this.dom.dropdown.appendChild(this.dom.statesWrapper);
     this.dom.dropdown.appendChild(this.dom.list);
     this.dom.dropdown.appendChild(footer);
 
@@ -214,47 +243,123 @@ class TKAFancySelect {
 
   renderOptions() {
     this.dom.list.innerHTML = '';
-    const options = Array.from(this.selectEl.options);
+    const children = Array.from(this.selectEl.children);
+    let flatIndex = 0;
 
-    options.forEach((opt, index) => {
-      const li = document.createElement('li');
-      li.className = 'tka-fancy-select-item';
-      li.setAttribute('role', 'option');
-      li.setAttribute('aria-selected', opt.selected ? 'true' : 'false');
-      if (opt.selected) li.classList.add('is-selected');
-      if (opt.disabled) {
-        li.classList.add('is-disabled');
-        li.setAttribute('aria-disabled', 'true');
-      }
-      li.dataset.index = index;
+    children.forEach(child => {
+      if (child.tagName === 'OPTGROUP') {
+        if (this.options.groupHeaders) {
+          const groupHeader = document.createElement('li');
+          groupHeader.className = 'tka-fancy-select-group-header';
+          groupHeader.textContent = child.label;
+          this.dom.list.appendChild(groupHeader);
+        }
 
-      const checkbox = document.createElement('div');
-      checkbox.className = 'tka-fancy-select-checkbox';
-      checkbox.innerHTML = `<svg class="tka-fancy-select-checkmark" viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5"></path></svg>`;
-
-      const label = document.createElement('span');
-      label.className = 'tka-fancy-select-label';
-      label.textContent = opt.text;
-
-      li.appendChild(checkbox);
-      li.appendChild(label);
-
-      if (this.options.showCount === true && opt.dataset.count) {
-        const count = document.createElement('span');
-        count.className = 'tka-fancy-select-count';
-        count.textContent = opt.dataset.count;
-        li.appendChild(count);
-      }
-
-      if (!opt.disabled && !this.selectEl.disabled) {
-        li.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.toggleOption(index);
+        Array.from(child.children).forEach(opt => {
+          this.createOptionItem(opt, flatIndex++);
         });
+      } else if (child.tagName === 'OPTION') {
+        this.createOptionItem(child, flatIndex++);
       }
-      
-      this.dom.list.appendChild(li);
     });
+
+    this.checkSelectionLimit();
+  }
+
+  createOptionItem(opt, index) {
+    const li = document.createElement('li');
+    li.className = 'tka-fancy-select-item';
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', opt.selected ? 'true' : 'false');
+    if (opt.selected) li.classList.add('is-selected');
+    if (opt.disabled) {
+      li.classList.add('is-disabled');
+      li.setAttribute('aria-disabled', 'true');
+    }
+    li.dataset.index = index;
+
+    const checkbox = document.createElement('div');
+    checkbox.className = 'tka-fancy-select-checkbox';
+    checkbox.innerHTML = `<svg class="tka-fancy-select-checkmark" viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5"></path></svg>`;
+
+    // Visuals (Icon or Image)
+    if (opt.dataset.icon || opt.dataset.image) {
+      const visual = document.createElement('div');
+      visual.className = 'tka-fancy-select-visual';
+      if (opt.dataset.image) {
+        visual.innerHTML = `<img src="${opt.dataset.image}" alt="">`;
+      } else {
+        visual.innerHTML = opt.dataset.icon;
+      }
+      li.appendChild(visual);
+    }
+
+    const label = document.createElement('span');
+    label.className = 'tka-fancy-select-label';
+    label.textContent = opt.text;
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+
+    if (this.options.showCount === true && opt.dataset.count) {
+      const count = document.createElement('span');
+      count.className = 'tka-fancy-select-count';
+      count.textContent = opt.dataset.count;
+      li.appendChild(count);
+    }
+
+    if (!opt.disabled && !this.selectEl.disabled) {
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleOption(index);
+      });
+    }
+    
+    this.dom.list.appendChild(li);
+  }
+
+  checkSelectionLimit() {
+    if (!this.isMultiple || !this.options.maxSelected) return;
+
+    const selectedCount = Array.from(this.selectEl.options).filter(o => o.selected).length;
+    const items = this.dom.list.querySelectorAll('.tka-fancy-select-item');
+
+    if (selectedCount >= this.options.maxSelected) {
+      items.forEach(item => {
+        if (!item.classList.contains('is-selected')) {
+          item.classList.add('is-limit-reached');
+        }
+      });
+    } else {
+      items.forEach(item => item.classList.remove('is-limit-reached'));
+    }
+  }
+
+  toggleOption(index) {
+    const options = this.selectEl.options;
+    const opt = options[index];
+
+    if (this.isMultiple) {
+      const selectedCount = Array.from(options).filter(o => o.selected).length;
+      if (!opt.selected && this.options.maxSelected && selectedCount >= this.options.maxSelected) {
+        this.emit('limit-reached', { limit: this.options.maxSelected });
+        return;
+      }
+      opt.selected = !opt.selected;
+    } else {
+      Array.from(options).forEach(o => o.selected = false);
+      opt.selected = true;
+      this.closeDropdown();
+    }
+
+    this.refresh();
+    this.triggerChangeEvent();
+    this.emit('change', { index, selected: opt.selected });
+  }
+
+  refresh() {
+    this.renderOptions();
+    this.updateTriggerText();
   }
 
   attachEvents() {
@@ -367,6 +472,11 @@ class TKAFancySelect {
   }
 
   filterOptions() {
+    if (this.options.remote) {
+      this.handleRemoteSearch();
+      return;
+    }
+
     const items = this.dom.list.querySelectorAll('.tka-fancy-select-item');
     let hasResults = false;
 
@@ -383,6 +493,69 @@ class TKAFancySelect {
     this.dom.noResults.style.display = hasResults ? 'none' : 'block';
     this.focusedIndex = -1;
     this.updateFocus([]);
+  }
+
+  handleRemoteSearch() {
+    clearTimeout(this.debounceTimer);
+    
+    if (this.searchQuery.length < 2) {
+      this.dom.noResults.style.display = 'none';
+      return;
+    }
+
+    this.showLoading();
+    this.debounceTimer = setTimeout(async () => {
+      try {
+        const results = await this.options.remote(this.searchQuery);
+        this.updateRemoteOptions(results);
+      } catch (error) {
+        console.error('TKAFancySelect Remote Error:', error);
+      } finally {
+        this.hideLoading();
+      }
+    }, this.options.debounceTimeout);
+  }
+
+  updateRemoteOptions(results) {
+    const selectedValues = Array.from(this.selectEl.options)
+      .filter(opt => opt.selected)
+      .map(opt => ({ value: opt.value, text: opt.text }));
+
+    const newOptions = results.filter(res => !selectedValues.some(sv => sv.value === res.value.toString()));
+
+    this.selectEl.innerHTML = '';
+    
+    selectedValues.forEach(sv => {
+      const opt = document.createElement('option');
+      opt.value = sv.value;
+      opt.text = sv.text;
+      opt.selected = true;
+      this.selectEl.appendChild(opt);
+    });
+
+    newOptions.forEach(res => {
+      const opt = document.createElement('option');
+      opt.value = res.value;
+      opt.text = res.text;
+      if (res.count) opt.dataset.count = res.count;
+      this.selectEl.appendChild(opt);
+    });
+
+    this.refresh();
+    this.dom.noResults.style.display = results.length === 0 ? 'block' : 'none';
+  }
+
+  showLoading() {
+    this.isLoading = true;
+    this.dom.loading.style.display = 'flex';
+    this.dom.list.style.opacity = '0.5';
+    this.dom.noResults.style.display = 'none';
+  }
+
+  hideLoading() {
+    this.isLoading = false;
+    this.dom.loading.style.display = 'none';
+    this.dom.list.style.opacity = '1';
   }
 
   toggleDropdown() {
@@ -403,6 +576,19 @@ class TKAFancySelect {
     this.dom.wrapper.classList.add('is-open');
     this.dom.wrapper.style.zIndex = this.options.dropdownZIndex;
     this.dom.trigger.setAttribute('aria-expanded', 'true');
+    
+    if (this.isMobile) {
+      document.body.style.overflow = 'hidden';
+      // Add overlay if it doesn't exist
+      if (!this.dom.overlay) {
+        this.dom.overlay = document.createElement('div');
+        this.dom.overlay.className = 'tfs-mobile-overlay';
+        this.dom.overlay.addEventListener('click', () => this.closeDropdown());
+        document.body.appendChild(this.dom.overlay);
+      }
+      this.dom.overlay.classList.add('is-active');
+    }
+
     this.focusedIndex = -1;
     
     if (this.options.hasSearch) {
@@ -419,6 +605,11 @@ class TKAFancySelect {
     this.dom.wrapper.classList.remove('is-open');
     this.dom.wrapper.style.zIndex = '';
     this.dom.trigger.setAttribute('aria-expanded', 'false');
+    
+    if (this.isMobile) {
+      document.body.style.overflow = '';
+      if (this.dom.overlay) this.dom.overlay.classList.remove('is-active');
+    }
     
     if (this.options.hasSearch) {
       this.searchQuery = '';
@@ -563,6 +754,11 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = TKAFancySelect;
 } else if (typeof define === 'function' && define.amd) {
   define(() => TKAFancySelect);
-} else {
+}
+
+// Always attach to window for easy drop-in usage
+if (typeof window !== 'undefined') {
   window.TKAFancySelect = TKAFancySelect;
 }
+
+export default TKAFancySelect;

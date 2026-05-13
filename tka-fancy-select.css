@@ -320,7 +320,7 @@
   border: 2px solid var(--tfs-color-border);
   margin-right: var(--tfs-spacing-sm);
   position: relative;
-  transition: var(--tfs-transition);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -340,7 +340,7 @@
   fill: none;
   stroke-dasharray: 20;
   stroke-dashoffset: 20;
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset 0.4s ease 0.1s; /* Slight delay for better visual flow */
 }
 
 .tka-fancy-select-item.is-selected .tka-fancy-select-checkmark {
@@ -407,9 +407,9 @@
   font-weight: 700;
   white-space: nowrap;
   animation: tfs-fade-in 0.2s ease;
-  flex-shrink: 0;
-  max-width: 120px;
-  /* Prevent single tags from being too wide */
+  flex-shrink: 1; /* Allow tags to shrink */
+  min-width: 0; /* Important for flex-shrink with ellipsis */
+  max-width: 100px; /* Reduced to leave space for the +xx tag */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -430,6 +430,51 @@
   background: rgba(255, 255, 255, 0.15);
   font-weight: 800;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0; /* Never shrink the counter */
+}
+
+/* Group Headers */
+.tka-fancy-select-group-header {
+  padding: var(--tfs-spacing-sm) 0 var(--tfs-spacing-xs) 0;
+  font-size: var(--tfs-font-size-xs);
+  font-weight: var(--tfs-font-weight-bold);
+  color: var(--tfs-color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+/* Visuals (Icons / Images) */
+.tka-fancy-select-visual {
+  width: 24px;
+  height: 24px;
+  margin-right: var(--tfs-spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--tfs-color-bg-hover);
+}
+
+.tka-fancy-select-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tka-fancy-select-visual svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--tfs-color-text-light);
+}
+
+/* Limit Reached State */
+.tka-fancy-select-item.is-limit-reached {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
 
 /* Adjust trigger action icon position */
@@ -488,4 +533,88 @@
 
 .tka-fancy-select-close:hover {
   background: var(--tfs-color-primary-hover);
+}
+
+/* Mobile Drawer Styles */
+@media (max-width: 600px) {
+  .tka-fancy-select-wrapper.is-mobile.is-open .tka-fancy-select-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70vh;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(0);
+    z-index: 10001;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tka-fancy-select-wrapper.is-mobile .tka-fancy-select-dropdown {
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  }
+
+  .tka-fancy-select-wrapper.is-mobile .tka-fancy-select-header {
+    border-bottom: 1px solid var(--tfs-color-border);
+    text-align: center;
+  }
+
+  .tka-fancy-select-wrapper.is-mobile .tka-fancy-select-list {
+    max-height: none;
+    flex-grow: 1;
+  }
+
+  .tka-fancy-select-wrapper.is-mobile .tka-fancy-select-footer {
+    padding-top: var(--tfs-spacing-md);
+  }
+}
+
+/* Mobile Overlay */
+.tfs-mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px); /* Slightly stronger blur for better focus */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 9990; /* Lowered to let the drawer sit on top */
+}
+
+.tfs-mobile-overlay.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Loading States */
+.tka-fancy-select-states {
+  position: relative;
+}
+
+.tka-fancy-select-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: var(--tfs-spacing-md);
+  color: var(--tfs-color-text-light);
+  font-size: var(--tfs-font-size-sm);
+}
+
+.tfs-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--tfs-color-border);
+  border-top-color: var(--tfs-color-primary);
+  border-radius: 50%;
+  animation: tfs-spin 0.8s linear infinite;
+}
+
+@keyframes tfs-spin {
+  to { transform: rotate(360deg); }
 }
